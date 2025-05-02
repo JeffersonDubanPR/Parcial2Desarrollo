@@ -5,9 +5,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -24,6 +26,8 @@ import androidx.compose.ui.unit.dp
 import kotlin.random.Random
 
 import androidx.compose.material3.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
 
 
 data class ProductoForm(
@@ -34,59 +38,95 @@ data class ProductoForm(
 )
 
 @Composable
-fun PantallaAgregarProducto(
-    onGuardar: (Producto) -> Unit,
+fun PantallaAgregar(
+    onProductoAgregado: (Producto) -> Unit,
     onCancelar: () -> Unit
 ) {
-    var formState by remember { mutableStateOf(ProductoForm()) }
+    var nombre by remember { mutableStateOf("") }
+    var precio by remember { mutableStateOf("") }
+    var descripcion by remember { mutableStateOf("") }
+    var imagenUrl by remember { mutableStateOf("") }
 
-    Column(modifier = Modifier.padding(16.dp)) {
-        Text("Agregar Producto", style = MaterialTheme.typography.headlineMedium)
+    val isValid = nombre.isNotBlank() && precio.toDoubleOrNull() != null &&
+            descripcion.isNotBlank() && imagenUrl.isNotBlank()
 
-        TextField(
-            value = formState.nombre,
-            onValueChange = { formState = formState.copy(nombre = it) },
-            label = { Text("Nombre del Producto") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        TextField(
-            value = formState.precio,
-            onValueChange = { formState = formState.copy(precio = it) },
-            label = { Text("Precio") },
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        TextField(
-            value = formState.descripcion,
-            onValueChange = { formState = formState.copy(descripcion = it) },
-            label = { Text("Descripción") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        TextField(
-            value = formState.imagenUrl,
-            onValueChange = { formState = formState.copy(imagenUrl = it) },
-            label = { Text("URL de Imagen") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Button(onClick = onCancelar) { Text("Cancelar") }
-            Button(onClick = {
-                if (formState.nombre.isNotBlank() && formState.precio.isNotBlank()) {
-                    val producto = Producto(
-                        id = (0..1000).random(),
-                        nombre = formState.nombre,
-                        precio = formState.precio.toDouble(),
-                        descripcion = formState.descripcion,
-                        imagenUrl = formState.imagenUrl
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = Color(0xFFF3F3F3) // Fondo claro
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    OutlinedTextField(
+                        value = nombre,
+                        onValueChange = { nombre = it },
+                        label = { Text("Nombre del producto") },
+                        modifier = Modifier.fillMaxWidth()
                     )
-                    onGuardar(producto)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = precio,
+                        onValueChange = { precio = it },
+                        label = { Text("Precio") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = descripcion,
+                        onValueChange = { descripcion = it },
+                        label = { Text("Descripción") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    OutlinedTextField(
+                        value = imagenUrl,
+                        onValueChange = { imagenUrl = it },
+                        label = { Text("URL de la imagen") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Button(
+                            onClick = onCancelar,
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
+                        ) {
+                            Text("Cancelar")
+                        }
+                        Button(
+                            onClick = {
+                                val nuevoProducto = Producto(
+                                    id = Random.nextInt(),
+                                    nombre = nombre,
+                                    precio = precio.toDouble(),
+                                    descripcion = descripcion,
+                                    imagenUrl = imagenUrl
+                                )
+                                onProductoAgregado(nuevoProducto)
+                            },
+                            enabled = isValid
+                        ) {
+                            Text("Guardar")
+                        }
+                    }
                 }
-            }) { Text("Guardar") }
+            }
         }
     }
 }

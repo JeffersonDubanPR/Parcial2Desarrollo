@@ -1,18 +1,16 @@
 package com.example.parcial2.Nav
 
-
-
-
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-
+import com.example.parcial2.Nav.Producto
 
 @Composable
 fun PantallaCarrito(
@@ -21,83 +19,75 @@ fun PantallaCarrito(
     onFinalizar: () -> Unit,
     onVolver: () -> Unit
 ) {
-    Column(
+    var mostrarConfirmacion by remember { mutableStateOf(false) }
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .background(Color(0xFFF5F5DC))
     ) {
-        Text("Carrito de Compras", style = MaterialTheme.typography.headlineMedium)
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        LazyColumn(modifier = Modifier.weight(1f)) {
-            items(productosEnCarrito) { producto ->
-                ProductoItem(producto)
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-
-        Text("Total: $${"%.2f".format(totalCarrito)}", style = MaterialTheme.typography.bodyLarge)
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
         ) {
-            Button(onClick = onVolver, modifier = Modifier.weight(1f)) {
-                Text("Volver al Catálogo")
+            Text("Carrito", style = MaterialTheme.typography.titleLarge)
+            Spacer(modifier = Modifier.height(16.dp))
+
+            LazyColumn {
+                items(productosEnCarrito) { producto ->
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.White)
+                    ) {
+                        Column(modifier = Modifier.padding(8.dp)) {
+                            Text(producto.nombre)
+                            Text("Precio: $${producto.precio}")
+                        }
+                    }
+                }
             }
 
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.height(16.dp))
+            Text("Total: $${String.format("%.2f", totalCarrito)}")
 
-            Button(onClick = onFinalizar, modifier = Modifier.weight(1f)) {
-                Text("Finalizar Compra")
+            Spacer(modifier = Modifier.height(16.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                Button(
+                    onClick = { mostrarConfirmacion = true },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
+                ) {
+                    Text("Finalizar", color = Color.White)
+                }
+
+                Button(
+                    onClick = onVolver,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFF44336))
+                ) {
+                    Text("Volver", color = Color.White)
+                }
             }
         }
-    }
-}
 
-@Composable
-fun ProductoItem(producto: Producto) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
-    ) {
-        Row(modifier = Modifier.padding(16.dp)) {
-
-            Text(
-                text = producto.nombre,
-                modifier = Modifier.weight(1f),
-                style = MaterialTheme.typography.bodyLarge
-            )
-            Text(
-                text = "$${"%.2f".format(producto.precio)}",
-                style = MaterialTheme.typography.bodyMedium
+        if (mostrarConfirmacion) {
+            AlertDialog(
+                onDismissRequest = { mostrarConfirmacion = false },
+                confirmButton = {
+                    TextButton(onClick = {
+                        mostrarConfirmacion = false
+                        onFinalizar()
+                    }) {
+                        Text("Aceptar")
+                    }
+                },
+                title = { Text("Compra Finalizada") },
+                text = { Text("¡Gracias por tu compra!") }
             )
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewPantallaCarrito() {
-    val productos = listOf(
-        Producto(1, "Producto 1", 10.0, "Descripción 1", ""),
-        Producto(2, "Producto 2", 15.0, "Descripción 2", ""),
-        Producto(3, "Producto 3", 20.0, "Descripción 3", "")
-    )
-    val totalCarrito = productos.sumOf { it.precio }
-
-    PantallaCarrito(
-        productosEnCarrito = productos,
-        totalCarrito = totalCarrito,
-        onFinalizar = {},
-        onVolver = {}
-    )
 }
