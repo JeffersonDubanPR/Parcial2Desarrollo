@@ -1,0 +1,13 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Base.Theme.Interfaz" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <item name="colorPrimary">@color/puppy_primary</item>
+        <item name="colorPrimaryVariant">@color/puppy_primary_dark</item>
+        <item name="colorOnPrimary">@color/puppy_primary_dark</item>
+        <item name="colorSecondary">@color/puppy_accent</item>
+        <item name="colorSecondaryVariant">@color/puppy_accent</item>
+        <item name="colorOnSecondary">@color/white</item>
+        <item name="android:statusBarColor">@color/puppy_primary_dark</item>
+    </style>
+
+    <style name="Theme.Interfaz" parent="Base.Theme.Interfaz" />
+</resources>
